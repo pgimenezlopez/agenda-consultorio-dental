@@ -31,3 +31,16 @@ Sistema simple, visual y funcional de agendamiento para consultorios dentales, d
    ```bash
    git clone https://github.com/tuusuario/agenda-consultorio-dental.git
    cd agenda-consultorio-dental
+
+1. Creá un entorno virtual:
+   ```bash
+   python -m venv venv
+   source venv/bin/activate  # o venv\Scripts\activate en Windows
+
+3. Instalá las dependencias:
+    ```bash
+   pip install -r requirements.txt
+
+4. Corré la aplicación:
+    ```bash
+    streamlit run app.py
