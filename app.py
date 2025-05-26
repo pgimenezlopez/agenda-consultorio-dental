@@ -6,6 +6,28 @@ import plotly.express as px
 import pandas as pd
 import base64
 from datetime import datetime
+from usuarios import USUARIOS
+
+if "logueado" not in st.session_state:
+    st.session_state["logueado"] = False
+
+if not st.session_state["logueado"]:
+    login()
+    st.stop()
+
+
+def login():
+    st.markdown("## 🔐 Iniciar sesión")
+    usuario = st.text_input("Usuario")
+    password = st.text_input("Contraseña", type="password")
+    if st.button("Ingresar"):
+        if usuario in USUARIOS and USUARIOS[usuario]["password"] == password:
+            st.session_state["logueado"] = True
+            st.session_state["usuario"] = usuario
+            st.rerun()
+        else:
+            st.error("Usuario o contraseña incorrectos")
+
 
 # Configuración de página
 st.set_page_config(
@@ -121,3 +143,7 @@ if st.button("📥 Exportar pacientes a Excel", use_container_width=True):
 if st.button("📥 Exportar turnos a Excel", use_container_width=True):
     archivo = exportar_turnos_excel()
     st.markdown(descargar_excel(archivo, "turnos.xlsx"), unsafe_allow_html=True)
+
+if st.button("Cerrar sesión"):
+    st.session_state["logueado"] = False
+    st.rerun()
