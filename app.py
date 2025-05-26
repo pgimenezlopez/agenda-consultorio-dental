@@ -72,7 +72,12 @@ st.dataframe(df_pacientes, use_container_width=True)
 
 st.subheader("📆 Agendar nuevo turno")
 
-nombres = df_pacientes["nombre"].tolist()
+if not df_pacientes.empty and "nombre" in df_pacientes.columns:
+    nombres = df_pacientes["nombre"].tolist()
+    paciente_seleccionado = st.selectbox("Paciente", nombres)
+else:
+    st.warning("⚠️ No hay pacientes cargados o la columna 'nombre' no está disponible.")
+
 
 with st.form("form_turno"):
     if "nombre" in df_pacientes.columns:
