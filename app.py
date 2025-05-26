@@ -39,6 +39,10 @@ st.set_page_config(
 
 crear_tablas()
 
+usuario_actual = st.session_state["usuario"]
+datos_usuario = USUARIOS[usuario_actual]
+st.markdown(f"👋 Bienvenido, **{datos_usuario['nombre']}**")
+
 # ------------------- Gestión de pacientes -------------------
 
 st.markdown("### 👤 Gestión de Pacientes")
