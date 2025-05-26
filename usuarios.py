@@ -5,7 +5,7 @@ USUARIOS = {
         "rol": "recepcion"
     },
     "odontologo": {
-        "nombre": "Dra. López",
+        "nombre": "Dr. López",
         "password": "dental456",
         "rol": "odontologo"
     }
