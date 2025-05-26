@@ -1,19 +1,17 @@
+from supabase_config import supabase
 import pandas as pd
-from db import conectar_db
 
 def agregar_paciente(nombre, telefono, observaciones):
-    conn = conectar_db()
-    cursor = conn.cursor()
-    cursor.execute("INSERT INTO pacientes (nombre, telefono, observaciones) VALUES (?, ?, ?)",
-                   (nombre, telefono, observaciones))
-    conn.commit()
-    conn.close()
+    supabase.table("pacientes").insert({
+        "nombre": nombre,
+        "telefono": telefono,
+        "observaciones": observaciones
+    }).execute()
 
 def obtener_pacientes():
-    conn = conectar_db()
-    df = pd.read_sql_query("SELECT * FROM pacientes", conn)
-    conn.close()
-    return df
+    response = supabase.table("pacientes").select("*").execute()
+    return pd.DataFrame(response.data)
+
 
 def exportar_pacientes_excel(nombre_archivo="pacientes.xlsx"):
     df = obtener_pacientes()
