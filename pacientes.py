@@ -10,7 +10,9 @@ def agregar_paciente(nombre, telefono, observaciones):
 
 def obtener_pacientes():
     response = supabase.table("pacientes").select("*").execute()
-    return pd.DataFrame(response.data)
+    data = response.data if response.data else []
+    return pd.DataFrame(data)
+
 
 
 def exportar_pacientes_excel(nombre_archivo="pacientes.xlsx"):

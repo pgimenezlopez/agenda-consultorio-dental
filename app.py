@@ -75,7 +75,12 @@ st.subheader("📆 Agendar nuevo turno")
 nombres = df_pacientes["nombre"].tolist()
 
 with st.form("form_turno"):
-    paciente_seleccionado = st.selectbox("Paciente", nombres)
+    if "nombre" in df_pacientes.columns:
+        nombres = df_pacientes["nombre"].tolist()
+        paciente_seleccionado = st.selectbox("Paciente", nombres)
+    else:
+        st.warning("⚠️ No hay pacientes cargados aún.")
+
     fecha = st.date_input("Fecha")
     hora = st.time_input("Hora")
     motivo = st.text_input("Motivo")
