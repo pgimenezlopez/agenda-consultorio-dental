@@ -41,28 +41,26 @@ crear_tablas()
 
 usuario_actual = st.session_state["usuario"]
 datos_usuario = USUARIOS[usuario_actual]
-st.markdown(f"👋 Bienvenido, **{datos_usuario['nombre']}**")
+rol = datos_usuario["rol"]
 
-# ------------------- Gestión de pacientes -------------------
+if rol == "recepcion":
+    st.markdown("### 👤 Gestión de Pacientes")
+    with st.form("form_paciente"):
+        col1, col2 = st.columns(2)
+        with col1:
+            nombre = st.text_input("Nombre del paciente")
+        with col2:
+            telefono = st.text_input("Teléfono")
 
-st.markdown("### 👤 Gestión de Pacientes")
+        observaciones = st.text_area("Observaciones")
+        submit_paciente = st.form_submit_button("💾 Guardar paciente")
 
-with st.form("form_paciente"):
-    col1, col2 = st.columns(2)
-    with col1:
-        nombre = st.text_input("Nombre del paciente")
-    with col2:
-        telefono = st.text_input("Teléfono")
+        if submit_paciente and nombre:
+            agregar_paciente(nombre, telefono, observaciones)
+            st.success(f"Paciente '{nombre}' guardado correctamente.")
 
-    observaciones = st.text_area("Observaciones")
+    st.divider()
 
-    submit_paciente = st.form_submit_button("💾 Guardar paciente")
-
-    if submit_paciente and nombre:
-        agregar_paciente(nombre, telefono, observaciones)
-        st.success(f"Paciente '{nombre}' guardado correctamente.")
-
-st.divider()
 
 # ------------------- Agendamiento de turnos -------------------
 
@@ -104,49 +102,52 @@ st.divider()
 
 # ------------------- Vista tipo calendario semanal -------------------
 
-st.markdown("### 📊 Vista Semanal (Calendario)")
+if rol == "odontologo":
+    st.divider()
+    st.markdown("### 📊 Vista Semanal (Calendario)")
 
-df_vista = obtener_turnos()
+    df_vista = obtener_turnos()
 
-if not df_vista.empty:
-    df_vista["start"] = df_vista.apply(lambda row: f"{row['fecha']} {row['hora']}", axis=1)
-    df_vista["start"] = pd.to_datetime(df_vista["start"])
-    df_vista["end"] = df_vista["start"] + pd.Timedelta(minutes=30)  # duración de 30 min
+    if not df_vista.empty:
+        df_vista["start"] = df_vista.apply(lambda row: f"{row['fecha']} {row['hora']}", axis=1)
+        df_vista["start"] = pd.to_datetime(df_vista["start"])
+        df_vista["end"] = df_vista["start"] + pd.Timedelta(minutes=30)
 
-    fig = px.timeline(
-        df_vista,
-        x_start="start",
-        x_end="end",
-        y="nombre",
-        color="motivo",
-        title="Turnos Semanales",
-        labels={"nombre": "Paciente"},
-    )
-    fig.update_yaxes(autorange="reversed")
-    st.plotly_chart(fig, use_container_width=True)
-else:
-    st.info("No hay turnos agendados para mostrar.")
+        fig = px.timeline(
+            df_vista,
+            x_start="start",
+            x_end="end",
+            y="nombre",
+            color="motivo",
+            title="Turnos Semanales",
+            labels={"nombre": "Paciente"},
+        )
+        fig.update_yaxes(autorange="reversed")
+        st.plotly_chart(fig, use_container_width=True)
+    else:
+        st.info("No hay turnos agendados para mostrar.")
 
-st.divider()
 
 # ------------------- Exportación -------------------
 
-st.markdown("### ⬇️ Exportación de Datos")
+if rol == "odontologo":
+    st.divider()
+    st.markdown("### ⬇️ Exportación de Datos")
 
-def descargar_excel(path, nombre_visible):
-    with open(path, "rb") as f:
-        data = f.read()
-    b64 = base64.b64encode(data).decode()
-    href = f'<a href="data:application/octet-stream;base64,{b64}" download="{nombre_visible}">📥 Descargar {nombre_visible}</a>'
-    return href
+    def descargar_excel(path, nombre_visible):
+        with open(path, "rb") as f:
+            data = f.read()
+        b64 = base64.b64encode(data).decode()
+        href = f'<a href="data:application/octet-stream;base64,{b64}" download="{nombre_visible}">📥 Descargar {nombre_visible}</a>'
+        return href
 
-if st.button("📥 Exportar pacientes a Excel", use_container_width=True):
-    archivo = exportar_pacientes_excel()
-    st.markdown(descargar_excel(archivo, "pacientes.xlsx"), unsafe_allow_html=True)
+    if st.button("📥 Exportar pacientes a Excel", use_container_width=True):
+        archivo = exportar_pacientes_excel()
+        st.markdown(descargar_excel(archivo, "pacientes.xlsx"), unsafe_allow_html=True)
 
-if st.button("📥 Exportar turnos a Excel", use_container_width=True):
-    archivo = exportar_turnos_excel()
-    st.markdown(descargar_excel(archivo, "turnos.xlsx"), unsafe_allow_html=True)
+    if st.button("📥 Exportar turnos a Excel", use_container_width=True):
+        archivo = exportar_turnos_excel()
+        st.markdown(descargar_excel(archivo, "turnos.xlsx"), unsafe_allow_html=True)
 
 if st.button("Cerrar sesión"):
     st.session_state["logueado"] = False
