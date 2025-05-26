@@ -8,14 +8,6 @@ import base64
 from datetime import datetime
 from usuarios import USUARIOS
 
-if "logueado" not in st.session_state:
-    st.session_state["logueado"] = False
-
-if not st.session_state["logueado"]:
-    login()
-    st.stop()
-
-
 def login():
     st.markdown("## 🔐 Iniciar sesión")
     usuario = st.text_input("Usuario")
@@ -27,6 +19,14 @@ def login():
             st.rerun()
         else:
             st.error("Usuario o contraseña incorrectos")
+
+
+if "logueado" not in st.session_state:
+    st.session_state["logueado"] = False
+
+if not st.session_state["logueado"]:
+    login()
+    st.stop()
 
 
 # Configuración de página
