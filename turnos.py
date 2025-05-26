@@ -2,7 +2,7 @@ import pandas as pd
 from supabase_config import supabase
 
 
-def agendar_turno(paciente_id, fecha, hora, motivo, profesional):
+def agendar_turno(paciente_id: object, fecha: object, hora: object, motivo: object, profesional: object) -> None:
     supabase.table("turnos").insert({
         "paciente_id": paciente_id,
         "fecha": fecha,

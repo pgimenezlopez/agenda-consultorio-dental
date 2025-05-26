@@ -41,6 +41,8 @@ crear_tablas()
 
 usuario_actual = st.session_state["usuario"]
 datos_usuario = USUARIOS[usuario_actual]
+profesional = datos_usuario["nombre"]
+
 rol = datos_usuario["rol"]
 
 if rol == "recepcion":
@@ -95,7 +97,7 @@ with st.form("form_turno"):
         paciente_row = df_pacientes[df_pacientes["nombre"] == paciente_seleccionado]
         if not paciente_row.empty:
             paciente_id = int(paciente_row.iloc[0]["id"])
-            agendar_turno(paciente_id, str(fecha), str(hora), motivo)
+            agendar_turno(paciente_id, str(fecha), str(hora), motivo, profesional)
             st.success(f"Turno agendado para {paciente_seleccionado} el {fecha} a las {hora}.")
         else:
             st.error("No se encontró el paciente seleccionado.")
