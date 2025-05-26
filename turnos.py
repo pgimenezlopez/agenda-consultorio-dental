@@ -1,26 +1,32 @@
 import pandas as pd
-from db import conectar_db
+from supabase_config import supabase
 
 
-def agendar_turno(paciente_id, fecha, hora, motivo):
-    conn = conectar_db()
-    cursor = conn.cursor()
-    cursor.execute("""
-        INSERT INTO turnos (paciente_id, fecha, hora, motivo)
-        VALUES (?, ?, ?, ?)
-    """, (paciente_id, fecha, hora, motivo))
-    conn.commit()
-    conn.close()
+def agendar_turno(paciente_id, fecha, hora, motivo, profesional):
+    supabase.table("turnos").insert({
+        "paciente_id": paciente_id,
+        "fecha": fecha,
+        "hora": hora,
+        "motivo": motivo,
+        "profesional": profesional
+    }).execute()
 
-def obtener_turnos():
-    conn = conectar_db()
-    df = pd.read_sql_query("""
-        SELECT turnos.id, pacientes.nombre, fecha, hora, motivo
-        FROM turnos, pacientes
-        WHERE turnos.id = pacientes.id
-    """, conn)
-    conn.close()
+
+def obtener_turnos(profesional=None):
+    query = supabase.table("turnos").select("id, fecha, hora, motivo, profesional, pacientes(nombre)")
+    if profesional:
+        query = query.eq("profesional", profesional)
+    response = query.execute()
+
+    data = response.data or []
+
+    # Normalizamos pacientes.nombre desde la relación
+    df = pd.json_normalize(data)
+    if "pacientes.nombre" in df.columns:
+        df.rename(columns={"pacientes.nombre": "nombre"}, inplace=True)
+
     return df
+
 
 def exportar_turnos_excel(nombre_archivo="turnos.xlsx"):
     df = obtener_turnos()
